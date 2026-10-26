@@ -5,6 +5,7 @@ import { useSite } from './lib/site-context.js'
 import { isPublic } from './lib/content.js'
 import { FilmCursor, Footer, Header } from './components.jsx'
 import {
+  About,
   Contact,
   Home,
   Houses,
@@ -22,6 +23,19 @@ const Login = lazy(() =>
   import('./Admin.jsx').then((module) => ({ default: module.Login })),
 )
 
+function SiteFrame({ children }) {
+  const { pathname } = useLocation()
+  return (
+    <div
+      className={
+        ['/login', '/admin'].includes(pathname) ? undefined : 'editorial-site'
+      }
+    >
+      {children}
+    </div>
+  )
+}
+
 function RouteEffects() {
   const { pathname, hash } = useLocation()
   const { content } = useSite()
@@ -30,6 +44,8 @@ function RouteEffects() {
       '/': 'For the love of cinema',
       '/work': 'Our work',
       '/houses': 'Five houses. One collective',
+      '/about': 'About us',
+      '/join': 'Join the team',
       '/updates': 'The journal',
       '/contact': 'Start a conversation',
       '/privacy': 'Privacy & permission',
@@ -89,54 +105,60 @@ export default function App() {
   return (
     <SiteProvider>
       <BrowserRouter>
-        <RouteEffects />
-        <FilmCursor paused={motionPaused} />
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
-        <div id="top" />
-        <Header
-          motionPaused={motionPaused}
-          reducedMotion={reducedMotion}
-          onMotionPauseChange={setMotionPaused}
-        />
-        <main
-          id="main-content"
-          data-site-motion={reducedMotion ? 'reduced' : motionPaused ? 'paused' : 'active'}
-        >
-          <Suspense
-            fallback={
-              <div className="page-loading" role="status">
-                Opening the studio...
-              </div>
+        <SiteFrame>
+          <RouteEffects />
+          <FilmCursor paused={motionPaused} />
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <div id="top" />
+          <Header
+            motionPaused={motionPaused}
+            reducedMotion={reducedMotion}
+            onMotionPauseChange={setMotionPaused}
+          />
+          <main
+            id="main-content"
+            data-site-motion={
+              reducedMotion ? 'reduced' : motionPaused ? 'paused' : 'active'
             }
           >
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <Home
-                    motionPaused={motionPaused}
-                    reducedMotion={reducedMotion}
-                    onMotionPauseChange={setMotionPaused}
-                  />
-                }
-              />
-              <Route path="/work" element={<Work />} />
-              <Route path="/work/:id" element={<ProjectDetail />} />
-              <Route path="/houses" element={<Houses />} />
-              <Route path="/people/:id" element={<ProfileDetail />} />
-              <Route path="/updates" element={<Updates />} />
-              <Route path="/updates/:id" element={<UpdateDetail />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </main>
-        <Footer />
+            <Suspense
+              fallback={
+                <div className="page-loading" role="status">
+                  Opening the studio...
+                </div>
+              }
+            >
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <Home
+                      motionPaused={motionPaused}
+                      reducedMotion={reducedMotion}
+                      onMotionPauseChange={setMotionPaused}
+                    />
+                  }
+                />
+                <Route path="/work" element={<Work />} />
+                <Route path="/work/:id" element={<ProjectDetail />} />
+                <Route path="/houses" element={<Houses />} />
+                <Route path="/people/:id" element={<ProfileDetail />} />
+                <Route path="/updates" element={<Updates />} />
+                <Route path="/updates/:id" element={<UpdateDetail />} />
+                <Route path="/contact" element={<Contact key="contact" />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/join" element={<Contact key="join" join />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </main>
+          <Footer />
+        </SiteFrame>
       </BrowserRouter>
     </SiteProvider>
   )

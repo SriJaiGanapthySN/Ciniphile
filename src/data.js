@@ -57,7 +57,8 @@ export const TAMIL_CINEMA = [
     note: 'A thousand lives. One boundless craft.',
     films: ['Nayakan', 'Anbe Sivam', 'Vikram'],
     filmography: 'https://en.wikipedia.org/wiki/Kamal_Haasan_filmography',
-    credit: 'Raaj Kamal Films International; still via Ananda Vikatan / MovieCrow',
+    credit:
+      'Raaj Kamal Films International; still via Ananda Vikatan / MovieCrow',
     source:
       'https://www.moviecrow.com/News/30522/vikram-censor-kamal-haasan-official-poster',
     license: 'Rights reserved; permission required',
@@ -178,7 +179,52 @@ export const RELATIONSHIPS = [
 export const ENQUIRY_TYPES = [
   ...HOUSES.map((house) => house.name),
   'Collaboration',
+  'Join the team',
   'General Enquiry',
+]
+
+// Placeholders: replace names, bios and photos (put the files in public/images/) with the real details.
+export const LEADERS = [
+  {
+    id: 'founder',
+    name: 'Founder name',
+    role: 'Founder',
+    image: IMAGES.camera,
+    bio: 'Cinephile began with one belief: a story told with love finds its people. Our founder brought five creative disciplines under one roof so ideas, films, talent and voices could grow together.',
+  },
+  {
+    id: 'ceo',
+    name: 'CEO name',
+    role: 'Chief Executive Officer',
+    image: IMAGES.hero,
+    bio: 'Our CEO steers the five houses day to day, turning a shared love for cinema into work that reaches the right audience, on time and with care.',
+  },
+]
+
+export const TEAM_ORDER = [
+  'creative',
+  'talent',
+  'promotion',
+  'production',
+  'influencer',
+]
+
+export const TAMIL_MILESTONES = [
+  ['1918', 'Keechaka Vadham', 'The first silent feature made in South India.'],
+  ['1931', 'Kalidas', 'The first Tamil talkie. The screen found its voice.'],
+  [
+    '1952',
+    'Parasakthi',
+    'Sivaji Ganesan arrives, and dialogue becomes thunder.',
+  ],
+  ['1977', '16 Vayathinile', 'Bharathiraja takes the camera to the village.'],
+  [
+    '1987',
+    'Nayakan',
+    'Mani Ratnam and Kamal Haasan reshape the gangster epic.',
+  ],
+  ['1992', 'Roja', 'A. R. Rahman debuts and the soundtrack changes forever.'],
+  ['2010', 'Enthiran', 'Tamil cinema goes big, bold and futuristic.'],
 ]
 
 export const INITIAL_CONTENT = {

@@ -4,11 +4,10 @@ import '@fontsource/manrope/latin-400.css'
 import '@fontsource/manrope/latin-500.css'
 import '@fontsource/manrope/latin-600.css'
 import '@fontsource/manrope/latin-700.css'
-import '@fontsource/barlow-condensed/latin-500.css'
-import '@fontsource/barlow-condensed/latin-600.css'
-import '@fontsource/barlow-condensed/latin-700.css'
+import '@fontsource/bebas-neue/latin-400.css'
 import '@fontsource/instrument-serif/latin-400-italic.css'
 import './styles.css'
+import './editorial.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

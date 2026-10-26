@@ -17,6 +17,9 @@ import {
   SquarePlay as Youtube,
 } from 'lucide-react'
 import {
+  LEADERS,
+  TAMIL_MILESTONES,
+  TEAM_ORDER,
   HOUSES,
   IMAGES,
   TAMIL_CINEMA,
@@ -38,6 +41,7 @@ import {
   ProjectCard,
   SectionHeading,
   TamilCinema,
+  Ticker,
   UpdateCard,
   Video,
 } from './components.jsx'
@@ -67,81 +71,100 @@ export function Home({ motionPaused, reducedMotion, onMotionPauseChange }) {
     >
       {(motionControl) => (
         <>
-          <section className="hero" aria-label="Cinephile creative collective">
-            <div
-              className="hero-portraits"
-              role="img"
-              aria-label={`${TAMIL_CINEMA.map((artist) => artist.name).join(', ')}: a tribute to Tamil cinema`}
-            >
-              {TAMIL_CINEMA.map((artist, index) => (
-                <figure
-                  className={`hero-portrait hero-portrait-${artist.id}`}
-                  key={artist.id}
-                >
-                  <img
-                    src={artist.image}
-                    alt=""
-                    fetchPriority={index === 2 ? 'high' : 'auto'}
-                    width="600"
-                    height="800"
-                  />
-                  <figcaption aria-hidden="true">
-                    <span>{artist.name}</span>
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-            <div className="hero-reel-note" aria-hidden="true">
-              CHENNAI / FOR THE LOVE OF CINEMA
-            </div>
+          <section
+            className="hero premiere-hero"
+            aria-label="Cinephile creative collective"
+          >
             <div className="hero-topnote">
               <span>
-                <Aperture size={12} aria-hidden="true" />
-                A LOVE LETTER TO TAMIL CINEMA.
+                <span className="live-dot" aria-hidden="true" /> AN INDEPENDENT
+                CREATIVE COLLECTIVE
               </span>
-              <span className="hero-edition">
-                FROM THE FIRST WHISTLE TO THE FINAL FRAME.
-              </span>
+              <span className="hero-edition">TAMIL ROOTS. NO LIMITS.</span>
             </div>
-            <div className="container hero-content">
-              <h1 aria-label="Cinephile.">
-                <span className="hero-wordmark" aria-hidden="true">
-                  {Array.from('CINEPHILE.').map((letter, index) => (
-                    <span
-                      className={`hero-letter${letter === '.' ? ' hero-period' : ''}`}
-                      style={{ '--letter-index': index }}
-                      key={`${letter}-${index}`}
-                    >
-                      {letter}
-                    </span>
-                  ))}
+            <div className="hero-content">
+              <span className="hero-wordmark" role="img" aria-label="Cinephile">
+                {Array.from('CINEPHILE.').map((letter, index) => (
+                  <span
+                    className={`hero-letter${letter === '.' ? ' hero-period' : ''}`}
+                    style={{ '--letter-index': index }}
+                    key={`${letter}-${index}`}
+                    aria-hidden="true"
+                  >
+                    {letter}
+                  </span>
+                ))}
+              </span>
+              <h1 aria-label="Cinema. With soul.">
+                <span className="hero-title-line">CINEMA.</span>
+                <span className="hero-title-line hero-title-outline">
+                  WITH SOUL.
                 </span>
               </h1>
+              <p className="hero-manifesto">
+                Not just something you watch.
+                <br />
+                <em>Something you feel.</em>
+              </p>
               <div className="hero-bottom">
-                <p>
-                  Raised on first-day whistles.
-                  <br />
-                  <em>Here for the stories that stay.</em>
-                </p>
                 <Link className="button button-dark" to="/work">
                   Explore our work <ArrowUpRight size={19} />
                 </Link>
+                <Link className="hero-about-link" to="/about">
+                  The people behind it <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+            <div className="premiere-stage">
+              <div className="stage-label">
+                <span>THE CINEMA THAT MADE US</span>
+                <span>VOL. 01 / TAMIL</span>
+              </div>
+              <div
+                className="hero-portraits"
+                role="img"
+                aria-label={`${TAMIL_CINEMA.map((artist) => artist.name).join(', ')}: a tribute to Tamil cinema`}
+              >
+                {TAMIL_CINEMA.map((artist, index) => (
+                  <figure
+                    className={`hero-portrait hero-portrait-${artist.id}`}
+                    key={artist.id}
+                  >
+                    <img
+                      src={artist.image}
+                      alt=""
+                      fetchPriority={index === 2 ? 'high' : 'auto'}
+                      width="600"
+                      height="800"
+                    />
+                    <figcaption aria-hidden="true">
+                      <span>{artist.name}</span>
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div className="stage-caption">
+                <span className="stage-signature">
+                  <Aperture aria-hidden="true" /> FANS FIRST.
+                  <br />
+                  FILMMAKERS ALWAYS.
+                </span>
                 <Link className="hero-houses" to="/houses">
                   <span className="hero-five">05</span>
                   <span>
-                    Distinct houses.
+                    Creative houses.
                     <br />
-                    One creative spirit.
+                    One obsession.
                   </span>
                   <ArrowUpRight size={21} />
                 </Link>
               </div>
             </div>
             <div className="hero-foot">
-              <span>VANAKKAM, CINEMA.</span>
-              <a href="#tamil-cinema" className="scroll-link">
-                The cinema that made us <ArrowDown size={16} />
+              <span lang="ta">வணக்கம், சினிமா.</span>
+              <a href="#studio" className="scroll-link">
+                Step inside the collective <ArrowDown size={16} />
               </a>
               <div className="hero-playback">
                 <span className="hero-timecode">AN EDITORIAL TRIBUTE</span>
@@ -149,23 +172,75 @@ export function Home({ motionPaused, reducedMotion, onMotionPauseChange }) {
               </div>
             </div>
           </section>
-          <div className="ticker" aria-hidden="true">
-            <div className="ticker-track">
-              {[0, 1].map((copy) => (
-                <div className="ticker-group" key={copy}>
-                  <span>FIRST DAY. FIRST SHOW.</span>
-                  <Aperture />
-                  <span>TAMIL ROOTS. TIMELESS STORIES.</span>
-                  <Aperture />
-                  <span>FOR THE LOVE OF CINEMA.</span>
-                  <Aperture />
-                  <span>FIVE HOUSES. ONE OBSESSION.</span>
-                  <Aperture />
-                </div>
-              ))}
+          <Ticker
+            items={[
+              'FIRST DAY. FIRST SHOW.',
+              'TAMIL ROOTS. TIMELESS STORIES.',
+              'FOR THE LOVE OF CINEMA.',
+              'FIVE HOUSES. ONE OBSESSION.',
+            ]}
+          />
+          <section
+            className="container studio-index"
+            id="studio"
+            aria-label="Explore the collective"
+          >
+            <div className="studio-index-intro">
+              <span className="eyebrow">
+                INDEPENDENT MINDS. SHARED OBSESSION.
+              </span>
+              <h2>
+                A studio for
+                <br />
+                <em>every frame.</em>
+              </h2>
+              <p>
+                From the first idea to the first-day whistle. Built around Tamil
+                cinema, open to every possibility.
+              </p>
             </div>
-          </div>
-          <TamilCinema />
+            <nav aria-label="Choose your next scene">
+              {[
+                [
+                  '01',
+                  '/work',
+                  'See the work',
+                  'Ideas, films & campaigns',
+                  IMAGES.coast,
+                ],
+                [
+                  '02',
+                  '/about',
+                  'Meet the people',
+                  'The minds behind the frames',
+                  IMAGES.camera,
+                ],
+                [
+                  '03',
+                  '/join',
+                  'Find your place',
+                  'Your next chapter starts here',
+                  IMAGES.stage,
+                ],
+              ].map(([number, to, title, note, image]) => (
+                <Link to={to} key={to}>
+                  <img
+                    src={image}
+                    alt=""
+                    width="600"
+                    height="400"
+                    loading="lazy"
+                  />
+                  <span className="index-number">{number}</span>
+                  <span>
+                    <strong>{title}</strong>
+                    <small>{note}</small>
+                  </span>
+                  <ArrowUpRight aria-hidden="true" />
+                </Link>
+              ))}
+            </nav>
+          </section>
           <section
             className="container story-section section-space"
             id="our-story"
@@ -275,6 +350,7 @@ export function Home({ motionPaused, reducedMotion, onMotionPauseChange }) {
               </p>
             </div>
           </section>
+          <TamilCinema />
           <section className="houses-section section-space">
             <div className="container">
               <SectionHeading
@@ -878,12 +954,190 @@ export function UpdateDetail({ entry, preview = false }) {
   )
 }
 
-export function Contact() {
+export function About() {
+  const { content } = useSite()
+  const team = content.profiles.filter(
+    (profile) =>
+      profile.relationship === 'Cinephile team member' &&
+      isPublic('profiles', profile),
+  )
+  return (
+    <>
+      <PageHeading
+        label="ABOUT CINEPHILE"
+        title={
+          <>
+            The people behind
+            <br />
+            <em>the love of cinema</em>
+          </>
+        }
+      >
+        One collective, five houses and a team that believes every story
+        deserves its audience.
+      </PageHeading>
+      <Ticker
+        items={[
+          'சினிமா · CINEMA',
+          'கதை · STORY',
+          'கனவு · DREAM',
+          'திரை · SCREEN',
+          'முதல் நாள், முதல் காட்சி',
+        ]}
+      />
+      <div className="container leadership-grid">
+        {LEADERS.map((leader) => (
+          <section
+            className="leader-card"
+            aria-labelledby={`${leader.id}-heading`}
+            key={leader.id}
+          >
+            <div className="leader-portrait">
+              <img
+                src={leader.image}
+                alt={`${leader.name}, ${leader.role}`}
+                width="800"
+                height="800"
+              />
+            </div>
+            <div className="leader-copy">
+              <span className="eyebrow">
+                THE {leader.id.toUpperCase()} / CINEPHILE
+              </span>
+              <h2 id={`${leader.id}-heading`}>
+                {leader.name}
+                <span className="accent">.</span>
+              </h2>
+              <h3>{leader.role}</h3>
+              <p>{leader.bio}</p>
+            </div>
+          </section>
+        ))}
+      </div>
+      <section className="milestones section-space">
+        <div className="container">
+          <SectionHeading
+            label="WHERE WE COME FROM"
+            title={
+              <>
+                A century of
+                <br />
+                <em>Tamil cinema.</em>
+              </>
+            }
+          >
+            We are fans first. These are some of the frames that taught us to
+            dream.
+          </SectionHeading>
+          <ol
+            className="milestone-strip"
+            tabIndex={0}
+            aria-label="Tamil cinema milestones"
+          >
+            {TAMIL_MILESTONES.map(([year, film, note]) => (
+              <li key={year}>
+                <span className="milestone-year">{year}</span>
+                <h3>{film}</h3>
+                <p>{note}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+      <section className="container people-section section-space">
+        <SectionHeading
+          label="OUR TEAMS"
+          title={
+            <>
+              Five teams,
+              <br />
+              <em>one creative spirit.</em>
+            </>
+          }
+          to="/houses"
+          linkText="Explore the houses"
+        />
+        <div className="profiles-grid">
+          {TEAM_ORDER.map((id) => HOUSES.find((house) => house.id === id)).map(
+            (house, index) => (
+              <Link
+                className="profile-card"
+                to={`/houses#${house.id}`}
+                key={house.id}
+              >
+                <img
+                  src={house.image}
+                  alt=""
+                  loading="lazy"
+                  width="500"
+                  height="600"
+                />
+                <span className="eyebrow">TEAM 0{index + 1}</span>
+                <h3>{house.name}</h3>
+                <p>{house.tagline}</p>
+                <ArrowUpRight size={20} />
+              </Link>
+            ),
+          )}
+        </div>
+      </section>
+      {team.length > 0 && (
+        <section className="container people-section section-space">
+          <SectionHeading
+            label="THE TEAM"
+            title={
+              <>
+                Faces of
+                <br />
+                <em>Cinephile.</em>
+              </>
+            }
+          />
+          <div className="profiles-grid">
+            {team.map((profile) => (
+              <Link
+                className="profile-card"
+                to={`/people/${profile.id}`}
+                key={profile.id}
+              >
+                <img
+                  src={safeUrl(profile.image, true)}
+                  alt={profile.title}
+                  loading="lazy"
+                  width="500"
+                  height="600"
+                />
+                <span className="eyebrow">{profile.role}</span>
+                <h3>{profile.title}</h3>
+                <ArrowUpRight size={20} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      <section className="container section-space">
+        <div className="people-empty">
+          <Aperture size={38} strokeWidth={1} />
+          <div>
+            <h3>There's a seat in the theatre for you.</h3>
+            <p>
+              We're always looking for people who love cinema as much as we do.
+            </p>
+          </div>
+          <ArrowLink to="/join">Join the team Cinephile</ArrowLink>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export function Contact({ join = false }) {
   const { content, addEnquiry } = useSite()
   const [params] = useSearchParams()
-  const initialType =
-    HOUSES.find((house) => house.id === params.get('type'))?.name ||
-    'General Enquiry'
+  const initialType = join
+    ? 'Join the team'
+    : HOUSES.find((house) => house.id === params.get('type'))?.name ||
+      'General Enquiry'
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const { settings } = content
@@ -915,18 +1169,34 @@ export function Contact() {
   }
   return (
     <>
-      <PageHeading
-        label="LET'S MAKE SOMETHING MATTER"
-        title={
-          <>
-            Every good story
-            <br />
-            <em>starts with hello</em>
-          </>
-        }
-      >
-        A brief, a big idea, or the beginning of one. We'd love to hear it.
-      </PageHeading>
+      {join ? (
+        <PageHeading
+          label="JOIN THE TEAM CINEPHILE"
+          title={
+            <>
+              Find your place
+              <br />
+              <em>in the frame</em>
+            </>
+          }
+        >
+          Writers, shooters, editors, strategists, dreamers. If cinema moves
+          you, tell us what you do and the house you'd love to call home.
+        </PageHeading>
+      ) : (
+        <PageHeading
+          label="LET'S MAKE SOMETHING MATTER"
+          title={
+            <>
+              Every good story
+              <br />
+              <em>starts with hello</em>
+            </>
+          }
+        >
+          A brief, a big idea, or the beginning of one. We'd love to hear it.
+        </PageHeading>
+      )}
       <section className="container contact-layout">
         <aside className="contact-info">
           <div className="contact-intro">
@@ -1072,10 +1342,15 @@ export function Contact() {
                 </select>
               </label>
               <label>
-                A little about your idea <span>*</span>
+                {join ? 'About you and your work' : 'A little about your idea'}{' '}
+                <span>*</span>
                 <textarea
                   name="message"
-                  placeholder="The story, the ambition, the what if..."
+                  placeholder={
+                    join
+                      ? 'Your craft, the house you want to join, a portfolio link...'
+                      : 'The story, the ambition, the what if...'
+                  }
                   rows={5}
                   minLength={10}
                   maxLength={5000}

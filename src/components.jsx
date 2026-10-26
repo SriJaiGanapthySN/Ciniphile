@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
   Aperture,
@@ -69,8 +69,14 @@ export function FilmCursor({ paused }) {
         const bounds = preview.getBoundingClientRect()
         const horizontal = (target.x - bounds.left) / bounds.width - 0.5
         const vertical = (target.y - bounds.top) / bounds.height - 0.5
-        preview.style.setProperty('--preview-x', `${horizontal * bounds.width * -0.035}px`)
-        preview.style.setProperty('--preview-y', `${vertical * bounds.height * -0.035}px`)
+        preview.style.setProperty(
+          '--preview-x',
+          `${horizontal * bounds.width * -0.035}px`,
+        )
+        preview.style.setProperty(
+          '--preview-y',
+          `${vertical * bounds.height * -0.035}px`,
+        )
       }
       frame =
         Math.abs(target.x - position.x) + Math.abs(target.y - position.y) > 0.1
@@ -81,7 +87,9 @@ export function FilmCursor({ paused }) {
       if (
         !preference.matches ||
         event.pointerType !== 'mouse' ||
-        event.target.closest('input, textarea, select, [contenteditable="true"], dialog')
+        event.target.closest(
+          'input, textarea, select, [contenteditable="true"], dialog',
+        )
       ) {
         hide()
         return
@@ -98,7 +106,11 @@ export function FilmCursor({ paused }) {
       }
       layer.dataset.active = 'true'
       layer.dataset.interactive = String(
-        Boolean(event.target.closest('a, button:not(:disabled), summary, [role="button"]')),
+        Boolean(
+          event.target.closest(
+            'a, button:not(:disabled), summary, [role="button"]',
+          ),
+        ),
       )
       if (frame === null) frame = requestAnimationFrame(follow)
     }
@@ -111,7 +123,10 @@ export function FilmCursor({ paused }) {
       layer.dataset.pressed = 'true'
       pulse.getAnimations().forEach((animation) => animation.cancel())
       pulse.animate(
-        [{ opacity: 0.8, transform: 'scale(0.6)' }, { opacity: 0, transform: 'scale(2)' }],
+        [
+          { opacity: 0.8, transform: 'scale(0.6)' },
+          { opacity: 0, transform: 'scale(2)' },
+        ],
         { duration: 460, easing: 'ease-out' },
       )
     }
@@ -140,7 +155,12 @@ export function FilmCursor({ paused }) {
   }, [disabled])
 
   return (
-    <div className="film-cursor" ref={layerRef} data-active="false" aria-hidden="true">
+    <div
+      className="film-cursor"
+      ref={layerRef}
+      data-active="false"
+      aria-hidden="true"
+    >
       <div className="cursor-position" ref={positionRef}>
         <Scan className="cursor-reticle" size={32} strokeWidth={1.3} />
         <span className="cursor-pulse" ref={pulseRef} />
@@ -149,7 +169,12 @@ export function FilmCursor({ paused }) {
   )
 }
 
-function MotionToggle({ paused, reducedMotion, onPauseChange, className = '' }) {
+function MotionToggle({
+  paused,
+  reducedMotion,
+  onPauseChange,
+  className = '',
+}) {
   const label = reducedMotion
     ? 'Animations disabled by system preference'
     : paused
@@ -170,7 +195,12 @@ function MotionToggle({ paused, reducedMotion, onPauseChange, className = '' }) 
   )
 }
 
-export function CinemaMotion({ children, paused, reducedMotion, onPauseChange }) {
+export function CinemaMotion({
+  children,
+  paused,
+  reducedMotion,
+  onPauseChange,
+}) {
   const rootRef = useRef(null)
 
   useEffect(() => {
@@ -341,10 +371,7 @@ export function Brand({ footer = false }) {
       className={`brand${footer ? ' brand-footer' : ''}`}
       aria-label="Cinephile home"
     >
-      <Aperture aria-hidden="true" strokeWidth={1.4} />
-      <span>
-        CINEPHILE<span className="brand-period">.</span>
-      </span>
+      <img src="/logo.png" alt="" width="358" height="164" />
     </Link>
   )
 }
@@ -377,7 +404,9 @@ export function Header({ motionPaused, reducedMotion, onMotionPauseChange }) {
             ['/', 'Home'],
             ['/work', 'Work'],
             ['/houses', 'Houses'],
+            ['/about', 'About'],
             ['/updates', 'Updates'],
+            ['/join', 'Join us'],
           ].map(([path, text]) => (
             <NavLink
               key={path}
@@ -448,7 +477,9 @@ export function Footer() {
           <span className="eyebrow">Explore</span>
           <Link to="/work">Our work</Link>
           <Link to="/houses">The five houses</Link>
+          <Link to="/about">About us</Link>
           <Link to="/updates">Latest updates</Link>
+          <Link to="/join">Join the team</Link>
           <Link to="/contact">Get in touch</Link>
         </div>
         <div className="footer-links">
@@ -501,6 +532,9 @@ export function Footer() {
           </a>
         </div>
       </div>
+      <div className="footer-wordmark" aria-hidden="true">
+        CINEPHILE.
+      </div>
     </footer>
   )
 }
@@ -511,6 +545,27 @@ export function ArrowLink({ to, children, className = '' }) {
       {children}
       <ArrowUpRight size={18} />
     </Link>
+  )
+}
+
+export function Ticker({ items }) {
+  return (
+    <div className="ticker" aria-hidden="true">
+      <div className="ticker-track">
+        {[0, 1].map((copy) => (
+          <div className="ticker-group" key={copy}>
+            {items.map((item) => (
+              <Fragment key={item}>
+                <span lang={/[\u0B80-\u0BFF]/.test(item) ? 'ta' : undefined}>
+                  {item}
+                </span>
+                <Aperture />
+              </Fragment>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -542,7 +597,13 @@ export function PageHeading({ label, title, children }) {
           {title}
           <span className="accent">.</span>
         </h1>
-        {children && <p>{children}</p>}
+        <div className="heading-deck">
+          <span className="heading-reel" aria-hidden="true">
+            <Aperture size={48} strokeWidth={1} />
+            TAMIL ROOTS / LIMITLESS STORIES
+          </span>
+          {children && <p>{children}</p>}
+        </div>
       </div>
     </section>
   )

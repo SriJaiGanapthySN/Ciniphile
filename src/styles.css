@@ -1,5 +1,15 @@
 @charset "UTF-8";
 
+/* Bebas Kai is not on npm: drop BebasKai.woff2 into public/fonts/. Until then Bebas Neue renders. */
+@font-face {
+  font-family: 'Bebas Kai';
+  src:
+    local('Bebas Kai'),
+    local('BebasKai'),
+    url('/fonts/BebasKai.woff2') format('woff2');
+  font-display: swap;
+}
+
 :root {
   font-family: 'Manrope', sans-serif;
   color: #000000;
@@ -16,7 +26,7 @@
   --surface-tint: #0245580d;
   --focus-ring: var(--accent);
   color-scheme: light;
-  --display: 'Barlow Condensed', sans-serif;
+  --display: 'Bebas Kai', 'Bebas Neue', sans-serif;
   --serif: 'Instrument Serif', Georgia, serif;
 }
 
@@ -266,7 +276,6 @@ main {
   position: relative;
   z-index: 20;
 }
-.site-header .brand-period,
 .site-header .menu-toggle {
   color: var(--paper);
 }
@@ -291,18 +300,10 @@ main {
   align-items: center;
   width: fit-content;
 }
-.brand > svg {
-  width: 33px;
-  height: 33px;
-}
-.brand > span {
-  font-family: var(--display);
-  font-size: 32px;
-  line-height: 1;
-  font-weight: 600;
-}
-.brand-period {
-  color: #024558;
+.brand > img {
+  display: block;
+  height: 44px;
+  width: auto;
 }
 .main-nav {
   display: flex;
@@ -354,15 +355,8 @@ main {
   .header-inner:has(.header-motion) {
     gap: 8px;
   }
-  .header-inner:has(.header-motion) .brand {
-    gap: 7px;
-  }
-  .header-inner:has(.header-motion) .brand > span {
-    font-size: 24px;
-  }
-  .header-inner:has(.header-motion) .brand > svg {
-    width: 24px;
-    height: 24px;
+  .header-inner:has(.header-motion) .brand > img {
+    height: 30px;
   }
 }
 .header-login {
@@ -404,7 +398,6 @@ main {
   color: var(--paper);
   border-bottom: 1px solid #e0e0e026;
 }
-.header-home .brand-period,
 .header-home .main-nav > a.active {
   color: var(--paper);
 }
@@ -750,7 +743,7 @@ main {
 .home-experience[data-motion='active'] .hero-bottom {
   animation-delay: 400ms;
 }
-.home-experience:not([data-motion='reduced']) .ticker-track {
+main:not([data-site-motion='reduced']) .ticker-track {
   animation: film-roll 38s linear infinite;
 }
 .home-experience:not([data-motion='reduced']) .hero-portraits::before,
@@ -802,7 +795,8 @@ main[data-site-motion='paused'] *::after {
 .home-experience[data-motion='active'] .section-heading::after {
   transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.home-experience[data-motion='active'] .section-heading[data-reveal='waiting']::after {
+.home-experience[data-motion='active']
+  .section-heading[data-reveal='waiting']::after {
   transform: scaleX(0);
 }
 .home-experience[data-motion='active'] .story-image::after,
@@ -817,8 +811,11 @@ main[data-site-motion='paused'] *::after {
   transform-origin: right;
   transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay);
 }
-.home-experience[data-motion='active'] .story-image[data-reveal='waiting']::after,
-.home-experience[data-motion='active'] .project-card[data-reveal='waiting'] .project-image::before {
+.home-experience[data-motion='active']
+  .story-image[data-reveal='waiting']::after,
+.home-experience[data-motion='active']
+  .project-card[data-reveal='waiting']
+  .project-image::before {
   transform: scaleX(1);
 }
 .home-experience .house-trigger {
@@ -1551,8 +1548,12 @@ main[data-site-motion='paused'] *::after {
   height: 100%;
   transition: transform 0.6s ease;
 }
-main[data-site-motion='active'] .project-card:is(:hover, :focus-visible) .project-image > img {
-  transform: scale(1.065) translate(var(--preview-x, 0px), var(--preview-y, 0px));
+main[data-site-motion='active']
+  .project-card:is(:hover, :focus-visible)
+  .project-image
+  > img {
+  transform: scale(1.065)
+    translate(var(--preview-x, 0px), var(--preview-y, 0px));
 }
 .preview-frame {
   position: absolute;
@@ -1564,10 +1565,16 @@ main[data-site-motion='active'] .project-card:is(:hover, :focus-visible) .projec
   opacity: 0;
   pointer-events: none;
   transform: scale(1.06);
-  transition: opacity 0.35s ease, transform 0.5s ease;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s ease;
 }
-main[data-site-motion='active'] .project-card:is(:hover, :focus-visible) .preview-frame,
-main[data-site-motion='active'] .update-image:is(:hover, :focus-visible) .preview-frame {
+main[data-site-motion='active']
+  .project-card:is(:hover, :focus-visible)
+  .preview-frame,
+main[data-site-motion='active']
+  .update-image:is(:hover, :focus-visible)
+  .preview-frame {
   opacity: 0.8;
   transform: scale(1);
 }
@@ -1764,7 +1771,8 @@ main[data-site-motion='active'] .update-image:is(:hover, :focus-visible) .previe
   filter: saturate(0.65);
 }
 main[data-site-motion='active'] .update-image:is(:hover, :focus-visible) img {
-  transform: scale(1.065) translate(var(--preview-x, 0px), var(--preview-y, 0px));
+  transform: scale(1.065)
+    translate(var(--preview-x, 0px), var(--preview-y, 0px));
 }
 .update-meta {
   display: flex;
@@ -1994,6 +2002,100 @@ main[data-site-motion='active'] .contact-orbit:is(:hover, :focus-visible) svg {
   .contact-orbit::before {
     animation: reel-turn 14s linear infinite;
   }
+  @supports (animation-timeline: view()) {
+    main[data-site-motion='active']
+      :is(
+        .house-chapter-visual,
+        .house-chapter-copy,
+        .profile-card,
+        .milestone-strip li,
+        .people-empty,
+        .contact-form-wrap
+      ) {
+      animation: scroll-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes scroll-rise {
+  from {
+    clip-path: inset(18% 0 0 0);
+    transform: translateY(48px) scale(0.97);
+  }
+  to {
+    clip-path: inset(0);
+    transform: none;
+  }
+}
+.milestones {
+  position: relative;
+  background: var(--accent);
+  color: var(--paper);
+  --focus-ring: var(--paper);
+}
+.milestones::before,
+.milestones::after {
+  content: '';
+  position: absolute;
+  inset: 14px 0 auto;
+  height: 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 14px,
+    #e0e0e033 14px 30px
+  );
+}
+.milestones::after {
+  inset: auto 0 14px;
+}
+.milestones .section-heading p {
+  color: #e0e0e0bf;
+}
+.milestone-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(230px, 1fr);
+  gap: 2px;
+  margin: 50px 0 0;
+  padding: 0 0 18px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--paper) transparent;
+}
+.milestone-strip li {
+  scroll-snap-align: start;
+  padding: 28px 24px 32px;
+  border-top: 1px solid #e0e0e059;
+  background: #0000002e;
+  transition: background 0.3s ease;
+}
+.milestone-strip li:hover {
+  background: #00000059;
+}
+.milestone-year {
+  display: block;
+  font-family: var(--display);
+  font-size: 64px;
+  line-height: 1;
+}
+.milestone-strip h3 {
+  margin: 18px 0 8px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+}
+.milestone-strip p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e0e0e0bf;
+}
+.ticker [lang='ta'] {
+  font-family:
+    var(--display), 'Noto Sans Tamil', 'Nirmala UI', 'Latha', sans-serif;
 }
 @keyframes headline-uncover {
   from {
@@ -3738,12 +3840,8 @@ form textarea {
   .main-nav {
     gap: 22px;
   }
-  .brand > span {
-    font-size: 28px;
-  }
-  .brand > svg {
-    width: 28px;
-    height: 28px;
+  .brand > img {
+    height: 38px;
   }
   .header-contact {
     gap: 15px;
@@ -4102,12 +4200,8 @@ form textarea {
   .header-inner {
     gap: 15px;
   }
-  .brand > span {
-    font-size: 29px;
-  }
-  .brand > svg {
-    width: 28px;
-    height: 28px;
+  .brand > img {
+    height: 36px;
   }
   .menu-toggle {
     display: inline-flex;

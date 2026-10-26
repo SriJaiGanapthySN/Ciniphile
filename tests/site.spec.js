@@ -115,6 +115,8 @@ test('public routes render, images load and layouts fit', async ({
     '/',
     '/work',
     '/houses',
+    '/about',
+    '/join',
     '/updates',
     '/contact',
     '/privacy',
@@ -135,7 +137,17 @@ test('public routes render, images load and layouts fit', async ({
         document.documentElement.clientWidth + 1,
     )
     expect(overflow, `Horizontal overflow at ${route}`).toBe(false)
-    if (['/', '/work', '/houses', '/contact', '/login'].includes(route))
+    if (
+      [
+        '/',
+        '/work',
+        '/houses',
+        '/about',
+        '/join',
+        '/contact',
+        '/login',
+      ].includes(route)
+    )
       await page.screenshot({
         path: testInfo.outputPath(
           `${route === '/' ? 'home' : route.slice(1)}.png`,
@@ -146,7 +158,55 @@ test('public routes render, images load and layouts fit', async ({
   expect(errors).toEqual([])
 })
 
-test('hero retains the complete wordmark and next-section hint without overlaps', async ({
+test('editorial layout preserves navigation, responsive structure and motion controls', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const sceneIndex = page.getByRole('navigation', {
+    name: 'Choose your next scene',
+  })
+  await expect(sceneIndex.getByRole('link')).toHaveCount(3)
+  await sceneIndex.getByRole('link', { name: /Meet the people/ }).click()
+  await expect(page).toHaveURL(/\/about$/)
+  await expect(page.locator('#founder-heading')).toBeVisible()
+  await expect(page.locator('#ceo-heading')).toBeAttached()
+
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 })
+    for (const route of ['/about', '/work', '/updates', '/join']) {
+      await page.goto(route)
+      await page.evaluate(() => document.fonts.ready)
+      const layout = await page.evaluate(() => {
+        const title = document
+          .querySelector('.page-heading h1')
+          .getBoundingClientRect()
+        const deck = document
+          .querySelector('.heading-deck')
+          .getBoundingClientRect()
+        return {
+          overflow: document.documentElement.scrollWidth > innerWidth + 1,
+          split: deck.left >= title.right - 1,
+          stacked: deck.top >= title.bottom - 1,
+        }
+      })
+      expect(layout.overflow, `${route} at ${width}px`).toBe(false)
+      expect(width > 760 ? layout.split : layout.stacked).toBe(true)
+    }
+  }
+
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto('/about')
+  const reel = page.locator('.heading-reel svg')
+  await expect(reel).toHaveCSS('animation-name', 'reel-turn')
+  await page.getByRole('button', { name: 'Pause animations' }).click()
+  await expect(reel).toHaveCSS('animation-name', 'none')
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(reel).toHaveCSS('animation-name', 'none')
+  await page.goto('/login')
+  await expect(page.locator('.editorial-site')).toHaveCount(0)
+})
+
+test('premiere hero keeps its title, portraits and scroll cue unclipped', async ({
   page,
 }, testInfo) => {
   for (const size of [
@@ -169,9 +229,11 @@ test('hero retains the complete wordmark and next-section hint without overlaps'
     await page.setViewportSize(size)
     await page.goto('/')
     await page.evaluate(() => document.fonts.ready)
-    await page.locator('.hero-portraits img').evaluateAll((images) =>
-      Promise.all(images.map((image) => image.decode())),
-    )
+    await page
+      .locator('.hero-portraits img')
+      .evaluateAll((images) =>
+        Promise.all(images.map((image) => image.decode())),
+      )
     const bounds = await page.evaluate(() => ({
       heroBottom: document.querySelector('.hero').getBoundingClientRect()
         .bottom,
@@ -179,7 +241,11 @@ test('hero retains the complete wordmark and next-section hint without overlaps'
         .querySelector('.hero-period')
         .getBoundingClientRect().right,
       viewportWidth: document.documentElement.clientWidth,
-      viewportHeight: innerHeight,
+      scrollCueBottom: document
+        .querySelector('.hero-foot')
+        .getBoundingClientRect().bottom,
+      titleRight: document.querySelector('.hero h1').getBoundingClientRect()
+        .right,
       contentWidth: document.documentElement.scrollWidth,
       clippedInterludeText: (() => {
         const scene = document
@@ -295,9 +361,12 @@ test('hero retains the complete wordmark and next-section hint without overlaps'
       })(),
     }))
     expect(
-      bounds.heroBottom,
-      `Next section at ${size.width}x${size.height}`,
-    ).toBeLessThan(bounds.viewportHeight)
+      bounds.scrollCueBottom,
+      `Scroll cue inside hero at ${size.width}x${size.height}`,
+    ).toBeLessThanOrEqual(bounds.heroBottom + 1)
+    expect(bounds.titleRight, `Title at ${size.width}px`).toBeLessThanOrEqual(
+      bounds.viewportWidth,
+    )
     expect(
       bounds.periodRight,
       `Wordmark at ${size.width}x${size.height}`,
@@ -465,49 +534,115 @@ test('Tamil cinema portraits and visible login work', async ({
   await expect(page.locator('.profile-card')).toHaveCount(0)
 })
 
-test('public-page motion shares pause state and keeps controls accessible', async ({ page }, testInfo) => {
+test('public-page motion shares pause state and keeps controls accessible', async ({
+  page,
+}, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto('/work')
-  await expect(page.locator('main')).toHaveAttribute('data-site-motion', 'active')
-  await expect(page.locator('.page-heading h1')).toHaveCSS('animation-name', 'headline-uncover')
+  await expect(page.locator('main')).toHaveAttribute(
+    'data-site-motion',
+    'active',
+  )
+  await expect(page.locator('.page-heading h1')).toHaveCSS(
+    'animation-name',
+    'headline-uncover',
+  )
   const preview = page.locator('.project-image').first()
-  const finePointer = await page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches)
+  const finePointer = await page.evaluate(
+    () => matchMedia('(hover: hover) and (pointer: fine)').matches,
+  )
   if (finePointer) {
     await preview.hover({ position: { x: 35, y: 40 } })
-    await expect.poll(() => preview.evaluate(element => parseFloat(element.style.getPropertyValue('--preview-x')))).toBeGreaterThan(0)
+    await expect
+      .poll(() =>
+        preview.evaluate((element) =>
+          parseFloat(element.style.getPropertyValue('--preview-x')),
+        ),
+      )
+      .toBeGreaterThan(0)
     await expect(preview.locator('.preview-frame')).toHaveCSS('opacity', '0.8')
-    await page.screenshot({ path: testInfo.outputPath('work-pointer-preview.png') })
+    await page.screenshot({
+      path: testInfo.outputPath('work-pointer-preview.png'),
+    })
   }
   await page.getByRole('button', { name: 'Pause animations' }).click()
-  await expect(page.locator('main')).toHaveAttribute('data-site-motion', 'paused')
-  await expect(page.locator('.page-heading h1')).toHaveCSS('animation-name', 'none')
+  await expect(page.locator('main')).toHaveAttribute(
+    'data-site-motion',
+    'paused',
+  )
+  await expect(page.locator('.page-heading h1')).toHaveCSS(
+    'animation-name',
+    'none',
+  )
   await expect(preview.locator('img')).toHaveCSS('transform', 'none')
-  await expect.poll(() => preview.evaluate(element => element.style.getPropertyValue('--preview-x'))).toBe('')
+  await expect
+    .poll(() =>
+      preview.evaluate((element) =>
+        element.style.getPropertyValue('--preview-x'),
+      ),
+    )
+    .toBe('')
   await page.getByRole('link', { name: 'Latest updates', exact: true }).click()
   await expect(page).toHaveURL('/updates')
-  await expect(page.getByRole('button', { name: 'Play animations' })).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Play animations' }),
+  ).toBeVisible()
   await expect(page.locator('.update-card').first()).toHaveCSS('opacity', '1')
   await page.getByRole('button', { name: 'Play animations' }).click()
-  await expect(page.locator('.update-card').first()).toHaveCSS('animation-name', 'proof-enter')
+  await expect(page.locator('.update-card').first()).toHaveCSS(
+    'animation-name',
+    'proof-enter',
+  )
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await expect(page.getByRole('button', { name: 'Animations disabled by system preference' })).toBeDisabled()
-  await expect(page.locator('.page-heading h1')).toHaveCSS('animation-name', 'none')
+  await expect(
+    page.getByRole('button', {
+      name: 'Animations disabled by system preference',
+    }),
+  ).toBeDisabled()
+  await expect(page.locator('.page-heading h1')).toHaveCSS(
+    'animation-name',
+    'none',
+  )
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 900 })
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    const header = await page.locator('.header-inner').evaluate(element => {
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true)
+    const header = await page.locator('.header-inner').evaluate((element) => {
       const brand = element.querySelector('.brand').getBoundingClientRect()
-      const tools = element.querySelector('.header-tools').getBoundingClientRect()
-      return { noOverlap: brand.right <= tools.left, inside: tools.right <= innerWidth }
+      const tools = element
+        .querySelector('.header-tools')
+        .getBoundingClientRect()
+      return {
+        noOverlap: brand.right <= tools.left,
+        inside: tools.right <= innerWidth,
+      }
     })
     expect(header).toEqual({ noOverlap: true, inside: true })
   }
-  await page.getByRole('link', { name: 'Cinephile home', exact: true }).first().click()
+  await page
+    .getByRole('link', { name: 'Cinephile home', exact: true })
+    .first()
+    .click()
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   const orbit = page.locator('.contact-orbit')
-  await expect.poll(() => orbit.evaluate(element => getComputedStyle(element, '::before').animationName)).toBe('reel-turn')
+  await expect
+    .poll(() =>
+      orbit.evaluate(
+        (element) => getComputedStyle(element, '::before').animationName,
+      ),
+    )
+    .toBe('reel-turn')
   await page.getByRole('button', { name: 'Pause animations' }).click()
-  await expect.poll(() => orbit.evaluate(element => getComputedStyle(element, '::before').animationPlayState)).toBe('paused')
+  await expect
+    .poll(() =>
+      orbit.evaluate(
+        (element) => getComputedStyle(element, '::before').animationPlayState,
+      ),
+    )
+    .toBe('paused')
 })
 
 test('camera cursor follows the pointer and respects input and motion preferences', async ({
@@ -516,8 +651,8 @@ test('camera cursor follows the pointer and respects input and motion preference
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto('/')
   const cursor = page.locator('.film-cursor')
-  const finePointer = await page.evaluate(() =>
-    matchMedia('(hover: hover) and (pointer: fine)').matches,
+  const finePointer = await page.evaluate(
+    () => matchMedia('(hover: hover) and (pointer: fine)').matches,
   )
   await page.mouse.move(180, 250)
   if (!finePointer) {
@@ -526,10 +661,14 @@ test('camera cursor follows the pointer and respects input and motion preference
   }
   await expect(cursor).toHaveAttribute('data-active', 'true')
   await expect(cursor).toHaveCSS('pointer-events', 'none')
-  await expect.poll(() => page.locator('.cursor-position').evaluate((element) => {
-    const bounds = element.getBoundingClientRect()
-    return Math.abs(bounds.left + bounds.width / 2 - 180)
-  })).toBeLessThan(1)
+  await expect
+    .poll(() =>
+      page.locator('.cursor-position').evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        return Math.abs(bounds.left + bounds.width / 2 - 180)
+      }),
+    )
+    .toBeLessThan(1)
   await page.mouse.down()
   await expect(cursor).toHaveAttribute('data-pressed', 'true')
   await page.mouse.up()
@@ -544,7 +683,9 @@ test('camera cursor follows the pointer and respects input and motion preference
   await page.mouse.move(-10, -10)
   await expect(cursor).toHaveAttribute('data-active', 'false')
   await page.mouse.move(180, 250)
-  await page.locator('body').dispatchEvent('pointerdown', { pointerType: 'touch' })
+  await page
+    .locator('body')
+    .dispatchEvent('pointerdown', { pointerType: 'touch' })
   await expect(cursor).toHaveAttribute('data-active', 'false')
   await page.getByRole('button', { name: 'Pause animations' }).click()
   await page.mouse.move(180, 250)
@@ -581,12 +722,15 @@ test('cinematic motion pauses, reveals content and respects system preferences',
   const experience = page.locator('.home-experience')
   const track = page.locator('.ticker-track')
   const reel = page.locator('.interlude-reel')
+  const filmPanel = page.locator('.premiere-stage')
   const scene = page.locator('.cinema-interlude')
   await expect(page.locator('.hero-letter')).toHaveCount(10)
   await expect(
-    page.getByRole('heading', { name: 'Cinephile.', exact: true }),
+    page.getByRole('heading', { name: 'Cinema. With soul.', exact: true }),
   ).toBeVisible()
   await expect(experience).toHaveAttribute('data-motion', 'active')
+  await expect(filmPanel).toHaveCSS('animation-name', 'premiere-float')
+  await expect(page.locator('.hero')).toHaveCSS('overflow', 'hidden')
   await expect
     .poll(() =>
       reel.evaluate((element) => element.getAnimations()[0]?.playState),
@@ -621,6 +765,16 @@ test('cinematic motion pauses, reveals content and respects system preferences',
   }
   await page.getByRole('button', { name: 'Pause animations' }).click()
   await expect(experience).toHaveAttribute('data-motion', 'paused')
+  await expect(filmPanel).toHaveCSS('animation-play-state', 'paused')
+  const panelPaused = await filmPanel.evaluate(async (element) => {
+    const animation = element.getAnimations()[0]
+    const before = animation.currentTime
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    )
+    return animation.currentTime === before
+  })
+  expect(panelPaused).toBe(true)
   await expect
     .poll(() =>
       reel.evaluate((element) => element.getAnimations()[0]?.playState),
@@ -691,6 +845,7 @@ test('cinematic motion pauses, reveals content and respects system preferences',
     )
     .toBe('none')
   await expect(reel).toHaveCSS('animation-name', 'none')
+  await expect(filmPanel).toHaveCSS('animation-name', 'none')
   expect(
     await scene.evaluate((element) =>
       element.style.getPropertyValue('--scene-progress'),
@@ -1154,6 +1309,8 @@ test('public pages and login pass automated accessibility checks', async ({
     '/',
     '/work',
     '/houses',
+    '/about',
+    '/join',
     '/updates',
     '/contact',
     '/privacy',
