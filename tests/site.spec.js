@@ -828,7 +828,9 @@ test('cinematic motion pauses, reveals content and respects system preferences',
       ),
     )
     .toBeGreaterThan(sceneStarted)
-  await scene.screenshot({ path: testInfo.outputPath('scroll-typography.png') })
+  await scene.screenshot({
+    path: testInfo.outputPath('scroll-typography.png'),
+  })
   await page
     .getByRole('link', { name: 'See what we make' })
     .scrollIntoViewIfNeeded()
@@ -1221,6 +1223,25 @@ test('updates, official contacts and validated backup restore work', async ({
   await expect(
     page.getByRole('heading', { name: 'Restored project headline.' }),
   ).toBeVisible()
+})
+
+test('overview shortcuts create records and open filtered draft lists', async ({
+  page,
+}) => {
+  await signIn(page)
+  await page.getByRole('button', { name: 'Create new update' }).click()
+  const dialog = page.getByRole('dialog', { name: 'New update' })
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Close dialog' }).click()
+  await page.getByRole('button', { name: 'Review Projects drafts' }).click()
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Admin sections' })
+      .getByRole('button', { name: 'Projects', exact: true }),
+  ).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByLabel('Filter by status')).toHaveValue('draft')
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(page.locator('.admin-panel')).toHaveCSS('animation-name', 'none')
 })
 
 test('all admin tabs and editor components share the site theme', async ({

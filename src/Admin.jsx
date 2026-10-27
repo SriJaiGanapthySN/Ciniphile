@@ -884,10 +884,10 @@ export default function Admin() {
       )
     : []
 
-  function changeTab(value) {
+  function changeTab(value, nextStatus = 'all') {
     setTab(value)
     setQuery('')
-    setStatus('all')
+    setStatus(nextStatus)
     setNotice('')
     setError('')
   }
@@ -1010,7 +1010,7 @@ export default function Admin() {
             View public website <ArrowUpRight size={14} />
           </Link>
         </aside>
-        <div className="admin-main">
+        <div className="admin-main admin-panel" key={tab}>
           {notice && (
             <div className="admin-notice">
               <SuccessMessage>{notice}</SuccessMessage>
@@ -1064,6 +1064,87 @@ export default function Admin() {
                     </span>
                   </button>
                 ))}
+              </div>
+              <div className="admin-workbench">
+                <section
+                  className="admin-quick-create"
+                  aria-labelledby="admin-quick-create-title"
+                >
+                  <div className="admin-workbench-heading">
+                    <h3 id="admin-quick-create-title">Start something new</h3>
+                    <p>Jump straight into a fresh draft.</p>
+                  </div>
+                  <div className="admin-quick-actions">
+                    {[
+                      {
+                        collection: 'projects',
+                        label: 'Project',
+                        description: 'Film and campaign work',
+                        icon: Clapperboard,
+                      },
+                      {
+                        collection: 'updates',
+                        label: 'Update',
+                        description: 'Notes from the studio',
+                        icon: FileText,
+                      },
+                      {
+                        collection: 'profiles',
+                        label: 'Profile',
+                        description: 'People in the collective',
+                        icon: Users,
+                      },
+                    ].map(({ collection, label, description, icon: Icon }) => (
+                      <button
+                        key={collection}
+                        aria-label={`Create new ${label.toLowerCase()}`}
+                        onClick={() =>
+                          setEditor({ collection, entry: newEntry(collection) })
+                        }
+                      >
+                        <Icon size={17} />
+                        <span>
+                          <strong>New {label}</strong>
+                          <small>{description}</small>
+                        </span>
+                        <ArrowUpRight size={14} />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+                <section
+                  className="admin-draft-review"
+                  aria-labelledby="admin-draft-review-title"
+                >
+                  <div className="admin-workbench-heading">
+                    <h3 id="admin-draft-review-title">Drafts to review</h3>
+                    <p>Open a collection with drafts already filtered.</p>
+                  </div>
+                  {[
+                    ['projects', 'Projects', Clapperboard],
+                    ['updates', 'Updates', FileText],
+                    ['profiles', 'Profiles', Users],
+                  ].map(([collection, label, Icon]) => (
+                    <button
+                      key={collection}
+                      aria-label={`Review ${label} drafts`}
+                      onClick={() => changeTab(collection, 'draft')}
+                    >
+                      <span>
+                        <Icon size={15} />
+                        <strong>{label}</strong>
+                      </span>
+                      <span className="admin-draft-count">
+                        {
+                          content[collection].filter(
+                            (entry) => entry.status === 'draft',
+                          ).length
+                        }
+                      </span>
+                      <ArrowRight size={14} />
+                    </button>
+                  ))}
+                </section>
               </div>
               <div className="admin-overview-work">
                 <div className="admin-section-title">
